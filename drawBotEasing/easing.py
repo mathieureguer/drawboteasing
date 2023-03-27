@@ -1,5 +1,5 @@
 import math
-import functools
+
 
 '''
 frame is the current time (or position) of the timeline.
@@ -7,6 +7,7 @@ origin is the start value of the property.
 change is the change between the start and end value of the property.
 duration is the total length of the timeline.
 '''
+
 
 # ----------------------------------------
 # decorators
@@ -17,7 +18,8 @@ def delay(start=10, end=10):
         @functools.wraps(func)
         def wrapper_delay(frame, origin, change, duration):
             if frame <= start:
-                delayed_frame = start
+                delayed_frame = origin
+                return origin
             elif frame > duration-end:
                 delayed_frame = duration-end
             else:
@@ -30,11 +32,12 @@ def frequencer(frequency=2):
     def decorator_frequencer(func):
         @functools.wraps(func)
         def wrapper_frequencer(frame, origin, change, duration):
-            frequenced_tween = astarts(astarts(frame/duration*frequency*2%4-2)/2*duration - duration)
+            frequenced_tween = abs(abs(frame/duration*frequency*2%4-2)/2*duration - duration)
             return func(frequenced_tween, origin, change, duration)
         return wrapper_frequencer
     return decorator_frequencer
-        
+    
+
 # ----------------------------------------
 # easing
 # ----------------------------------------
@@ -57,7 +60,7 @@ def easeInOutQuad(frame, origin, change, duration):
     frame-=1
     return -change/2 * (frame*(frame-2) - 1) + origin
 
-def easeInOutCustartic(frame, origin, change, duration):
+def easeInOutCubic(frame, origin, change, duration):
     frame /= duration/2
     if frame < 1:
        return change/2*frame*frame*frame + origin
@@ -121,7 +124,7 @@ def easeInOutExpo(frame, origin, change, duration):
 
 def easeInCirc(frame, origin, change, duration):
     # this one does not work so well
-    # change cannot starte higher than duration (?)
+    # change cannot be higher than duration (?)
     frame /= duration
     return -change * (math.sqrt(1 - frame*frame) - 1) + origin
 
