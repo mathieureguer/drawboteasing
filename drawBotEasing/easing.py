@@ -29,11 +29,13 @@ def delay(start=10, end=10):
         return wrapper_delay
     return decorator_delay
     
-def frequencer(frequency=2):
+def frequencer(frequency=2, round=True):
     def decorator_frequencer(func):
         @functools.wraps(func)
         def wrapper_frequencer(frame, origin, change, duration):
             frequenced_tween = abs(abs(frame/duration*frequency*2%4-2)/2*duration - duration)
+            if round:
+                frequenced_tween = int(frequenced_tween)
             return func(frequenced_tween, origin, change, duration)
         return wrapper_frequencer
     return decorator_frequencer
