@@ -21,26 +21,46 @@ def delay(start=10, end=10):
             if frame <= start:
                 delayed_frame = origin
                 return origin
-            elif frame > duration-end:
-                delayed_frame = duration-end
+            elif frame >= duration - end:
+                delayed_frame = duration - start - end
             else:
                 delayed_frame = frame-start
-            return func(delayed_frame, origin, change, duration-end)
+            return func(delayed_frame, origin, change, duration - start - end)
         return wrapper_delay
     return decorator_delay
     
-def frequencer(frequency=2, round=True):
+def frequencer(frequency=2, rounded=True):
     def decorator_frequencer(func):
         @functools.wraps(func)
         def wrapper_frequencer(frame, origin, change, duration):
             frequenced_tween = abs(abs(frame/duration*frequency*2%4-2)/2*duration - duration)
-            if round:
-                frequenced_tween = int(frequenced_tween)
+            if rounded:
+                frequenced_tween = round(frequenced_tween)
             return func(frequenced_tween, origin, change, duration)
         return wrapper_frequencer
     return decorator_frequencer
-    
 
+# ----------------------------------------
+# iterator
+# ----------------------------------------
+
+class EasedRange:
+    def __init__(self, easing_funct, origin, change, duration):
+        self.current_frame = -1
+        self.easing_funct = easing_funct
+        self.origin = origin
+        self.change = change
+        self.duration = duration
+        
+    def __iter__(self):
+        return self
+        
+    def __next__(self):
+        self.current_frame += 1
+        if self.current_frame < self.duration:
+            return self.easing_funct(self.current_frame, self.origin, self.change, self.duration)
+        raise StopIteration
+    
 # ----------------------------------------
 # easing
 # ----------------------------------------
